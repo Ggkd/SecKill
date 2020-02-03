@@ -2,8 +2,10 @@ package conf
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/coreos/etcd/clientv3"
+	"github.com/coreos/etcd/mvcc/mvccpb"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
@@ -55,22 +57,81 @@ func InitEtcd()  {
 	sugarLogger.Info("----------初始化etcd成功----------")
 }
 
+
+// 获取秒杀商品的配置
 func InitSecInfo()  {
-	resp, err := EtcdClient.Get(context.Background(), Config.Etcd.SecKill_key)
+	key := fmt.Sprintf("%s/%s", Config.Etcd.SecKill_key, Config.Etcd.ProductKey)
+	resp, err := EtcdClient.Get(context.Background(), key)
 	if err != nil {
 		fmt.Println("get secInfo Key err--------->", err)
 		sugarLogger.Error("get secInfo Key err--------->", err)
 		return
 	}
-	for k, v := range resp.Kvs {
-		sugarLogger.Debugf("get secInfo Key[%v], Value[%v]", k, v)
+	var ProductInfos []SecKillInfo
+	for _, kv := range resp.Kvs {
+		//fmt.Printf("get secInfo Key[%v], Value[%v]\n", string(kv.Key), string(kv.Value))
+		err := json.Unmarshal(kv.Value, &ProductInfos)
+		if err != nil {
+			fmt.Println("unmarshal err-------->", err)
+			sugarLogger.Errorf("unmarshal err-------->", err)
+			return
+		}
+		sugarLogger.Debugf("get secInfo Key[%v], Value[%v]", string(kv.Key), string(kv.Value))
 	}
-
+	UpdateSecProduct(ProductInfos)
 }
 
+
+// 监控etcd
+func WatchEtcd()  {
+	fmt.Println("---------etcd watching-----------")
+	sugarLogger.Debug("---------etcd watching-----------")
+	key := fmt.Sprintf("%s/%s", Config.Etcd.SecKill_key, Config.Etcd.ProductKey)
+	for {
+		watchChan := EtcdClient.Watch(context.Background(), key)
+		var getConfSuccess = true
+		var secProductInfos []SecKillInfo
+		for event := range watchChan {
+			for _, ev := range event.Events {
+				if ev.Type != mvccpb.DELETE {
+					// 判断是否为删除事件
+					err := json.Unmarshal(ev.Kv.Value, &secProductInfos)
+					if err != nil {
+						fmt.Println("unmarshal err : ", err)
+						getConfSuccess = false
+						continue
+					}
+				}
+			}
+			if getConfSuccess {
+				UpdateSecProduct(secProductInfos)
+			}
+		}
+	}
+}
+
+
+// 更新最新的商品信息
+func UpdateSecProduct(productInfo []SecKillInfo)  {
+	tmp := make(map[int]*SecKillInfo, 1000)
+	for _, info := range productInfo {
+		tmp[info.ProductId] = &info
+	}
+	Config.RwLock.Lock()
+	Config.SecKillProductMap = tmp
+	Config.RwLock.Unlock()
+	fmt.Println("------------------------->", Config.SecKillProductMap)
+	sugarLogger.Info("------------------------->", Config.SecKillProductMap)
+}
+
+
+// 全局初始化
 func init()  {
+	Config.SecKillProductMap = make(map[int]*SecKillInfo, 1000)
 	fmt.Println("===========初始化Log、Redis、Etcd===========")
 	InitLog()
 	InitRedis()
 	InitEtcd()
+	InitSecInfo()
+	go WatchEtcd()
 }

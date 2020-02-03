@@ -3,15 +3,17 @@ package conf
 import (
 	"fmt"
 	"gopkg.in/ini.v1"
-	"time"
+	"sync"
 )
 
 // 总配置
 type Conf struct {
-	Host  `ini:"host"`
-	Redis `ini:"redis"`
-	Etcd  `ini:"etcd"`
-	Log   `ini:"log"`
+	Host              `ini:"host"`
+	Redis             `ini:"redis"`
+	Etcd              `ini:"etcd"`
+	Log               `ini:"log"`
+	SecKillProductMap map[int]*SecKillInfo
+	RwLock            sync.Mutex
 }
 
 // 主机配置
@@ -35,6 +37,7 @@ type Etcd struct {
 	Port        string `ini:"port"`
 	DialTimeout int    `ini:"DialTimeout"`
 	SecKill_key string `ini:"secKill_key"`
+	ProductKey  string `ini:"product_key"`
 }
 
 // log配置
@@ -45,14 +48,14 @@ type Log struct {
 
 // 秒杀商品配置
 type SecKillInfo struct {
-	ProductId 	int
-	StartTime	time.Time
-	EndTime		time.Time
-	Count		int
-	Status 		int
+	ProductId int
+	StartTime int
+	EndTime   int
+	Count     int
+	Status    int
 }
 
-
+// 全局配置对象
 var Config = new(Conf)
 
 //从配置文件加载所有配置
