@@ -21,15 +21,15 @@ func PutEtcdProduct(client *clientv3.Client)  {
 	}
 	p1 := SecKillInfo{
 		ProductId: 11,
-		StartTime: 1580711459,
-		EndTime:   1580712878,
+		StartTime: 1580711411,
+		EndTime:   1580712811,
 		Count:     100,
 		Status:    1,
 	}
 	p2 := SecKillInfo{
-		ProductId: 111,
-		StartTime: 1580711459,
-		EndTime:   1580712878,
+		ProductId: 22,
+		StartTime: 1580711422,
+		EndTime:   1580712822,
 		Count:     50,
 		Status:    1,
 	}

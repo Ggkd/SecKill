@@ -6,6 +6,6 @@ import (
 )
 
 func Router(router *gin.Engine)  {
-	router.Any("/secInfo", controller.SecInfo)
+	router.GET("/secInfo", controller.SecInfo)
 	router.Any("/secKill", controller.SecKill)
 }

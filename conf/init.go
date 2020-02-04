@@ -114,8 +114,8 @@ func WatchEtcd()  {
 // 更新最新的商品信息
 func UpdateSecProduct(productInfo []SecKillInfo)  {
 	tmp := make(map[int]*SecKillInfo, 1000)
-	for _, info := range productInfo {
-		tmp[info.ProductId] = &info
+	for i, _ := range productInfo {
+		tmp[productInfo[i].ProductId] = &productInfo[i]
 	}
 	Config.RwLock.Lock()
 	Config.SecKillProductMap = tmp

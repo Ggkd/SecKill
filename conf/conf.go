@@ -13,7 +13,7 @@ type Conf struct {
 	Etcd              `ini:"etcd"`
 	Log               `ini:"log"`
 	SecKillProductMap map[int]*SecKillInfo
-	RwLock            sync.Mutex
+	RwLock            sync.RWMutex
 }
 
 // 主机配置
@@ -53,6 +53,14 @@ type SecKillInfo struct {
 	EndTime   int
 	Count     int
 	Status    int
+}
+
+
+//返回响应
+type Result struct {
+	Code int
+	Msg  string
+	Data interface{}
 }
 
 // 全局配置对象
