@@ -1,5 +1,5 @@
-{"level":"info","ts":1580825654.008451,"msg":"----------初始化redis成功----------"}
-{"level":"info","ts":1580825654.0096052,"msg":"----------初始化etcd成功----------"}
-{"level":"debug","ts":1580825654.011156,"msg":"get secInfo Key[secKill/product], Value[[{\"ProductId\":11,\"StartTime\":1580711411,\"EndTime\":1580712811,\"Count\":100,\"Status\":1},{\"ProductId\":22,\"StartTime\":1580711422,\"EndTime\":1580712822,\"Count\":50,\"Status\":1}]]"}
-{"level":"info","ts":1580825654.011234,"msg":"------------------------->map[11:0xc00003e0a0 22:0xc00003e0c8]"}
-{"level":"debug","ts":1580825654.011317,"msg":"---------etcd watching-----------"}
+{"level":"info","ts":1580892886.762657,"msg":"----------初始化redis成功----------"}
+{"level":"info","ts":1580892886.7635698,"msg":"----------初始化etcd成功----------"}
+{"level":"debug","ts":1580892886.765286,"msg":"get secInfo Key[secKill/product], Value[[{\"ProductId\":11,\"StartTime\":1580711411,\"EndTime\":1580712811,\"Count\":100,\"Status\":1},{\"ProductId\":22,\"StartTime\":1580711422,\"EndTime\":1580712822,\"Count\":50,\"Status\":1}]]"}
+{"level":"info","ts":1580892886.7654028,"msg":"------------------------->map[11:0xc00003e0a0 22:0xc00003e0c8]"}
+{"level":"debug","ts":1580892886.765482,"msg":"---------etcd watching-----------"}

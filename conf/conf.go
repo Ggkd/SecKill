@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopkg.in/ini.v1"
 	"sync"
+	"time"
 )
 
 // 总配置
@@ -14,6 +15,9 @@ type Conf struct {
 	Log               `ini:"log"`
 	SecKillProductMap map[int]*SecKillInfo
 	RwLock            sync.RWMutex
+	UserControl       `ini:"user_control"`
+	UserIdBlackList   map[string]bool
+	UserIpBlackList   map[string]bool
 }
 
 // 主机配置
@@ -49,12 +53,32 @@ type Log struct {
 // 秒杀商品配置
 type SecKillInfo struct {
 	ProductId int
-	StartTime int
-	EndTime   int
+	StartTime int64
+	EndTime   int64
 	Count     int
 	Status    int
 }
 
+// 用户请求配置
+type ReqSecKill struct {
+	ProductId  int
+	UserId     string
+	SecTime    int
+	Source     string
+	Nance      string
+	AuthCode   string
+	UserAuth   string
+	AccessTime time.Time
+	UserAddr   string
+	UserRefer  string
+}
+
+type UserControl struct {
+	Secret    string   `int:"secret"`
+	ReqLimit  int      `ini:"req_limit"`
+	IpLimit   int      `ini:"ip_limit"`
+	ReferList []string `ini:"refer_list"`
+}
 
 //返回响应
 type Result struct {

@@ -31,11 +31,11 @@ func InitRedis()  {
 	_, err := conn.Do("ping")
 	if err != nil {
 		fmt.Println("初始化redis err--------->", err)
-		sugarLogger.Error("初始化redis err--------->", err)
+		SugarLogger.Error("初始化redis err--------->", err)
 		return
 	}
 	fmt.Println("----------初始化redis成功----------")
-	sugarLogger.Info("----------初始化redis成功----------")
+	SugarLogger.Info("----------初始化redis成功----------")
 }
 
 
@@ -50,11 +50,11 @@ func InitEtcd()  {
 	})
 	if err != nil {
 		fmt.Println("初始化etcd err--------->", err)
-		sugarLogger.Error("初始化etcd err--------->", err)
+		SugarLogger.Error("初始化etcd err--------->", err)
 		return
 	}
 	fmt.Println("----------初始化etcd成功----------")
-	sugarLogger.Info("----------初始化etcd成功----------")
+	SugarLogger.Info("----------初始化etcd成功----------")
 }
 
 
@@ -64,7 +64,7 @@ func InitSecInfo()  {
 	resp, err := EtcdClient.Get(context.Background(), key)
 	if err != nil {
 		fmt.Println("get secInfo Key err--------->", err)
-		sugarLogger.Error("get secInfo Key err--------->", err)
+		SugarLogger.Error("get secInfo Key err--------->", err)
 		return
 	}
 	var ProductInfos []SecKillInfo
@@ -73,10 +73,10 @@ func InitSecInfo()  {
 		err := json.Unmarshal(kv.Value, &ProductInfos)
 		if err != nil {
 			fmt.Println("unmarshal err-------->", err)
-			sugarLogger.Errorf("unmarshal err-------->", err)
+			SugarLogger.Errorf("unmarshal err-------->", err)
 			return
 		}
-		sugarLogger.Debugf("get secInfo Key[%v], Value[%v]", string(kv.Key), string(kv.Value))
+		SugarLogger.Debugf("get secInfo Key[%v], Value[%v]", string(kv.Key), string(kv.Value))
 	}
 	UpdateSecProduct(ProductInfos)
 }
@@ -85,7 +85,7 @@ func InitSecInfo()  {
 // 监控etcd
 func WatchEtcd()  {
 	fmt.Println("---------etcd watching-----------")
-	sugarLogger.Debug("---------etcd watching-----------")
+	SugarLogger.Debug("---------etcd watching-----------")
 	key := fmt.Sprintf("%s/%s", Config.Etcd.SecKill_key, Config.Etcd.ProductKey)
 	for {
 		watchChan := EtcdClient.Watch(context.Background(), key)
@@ -121,7 +121,7 @@ func UpdateSecProduct(productInfo []SecKillInfo)  {
 	Config.SecKillProductMap = tmp
 	Config.RwLock.Unlock()
 	fmt.Println("------------------------->", Config.SecKillProductMap)
-	sugarLogger.Info("------------------------->", Config.SecKillProductMap)
+	SugarLogger.Info("------------------------->", Config.SecKillProductMap)
 }
 
 

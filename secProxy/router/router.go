@@ -7,5 +7,5 @@ import (
 
 func Router(router *gin.Engine)  {
 	router.GET("/secInfo", controller.SecInfo)
-	router.Any("/secKill", controller.SecKill)
+	router.GET("/secKill", controller.SecKill)
 }

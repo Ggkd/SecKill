@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var sugarLogger *zap.SugaredLogger
+var SugarLogger *zap.SugaredLogger
 // 初始化log
 func InitLog() {
 	level := GetLogLevel()
@@ -14,8 +14,8 @@ func InitLog() {
 	encoder := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
 	core := zapcore.NewCore(encoder, writeSyncer, level)
 	logger := zap.New(core)
-	sugarLogger = logger.Sugar()
-	defer sugarLogger.Sync()
+	SugarLogger = logger.Sugar()
+	defer SugarLogger.Sync()
 }
 
 func GetLogLevel() zapcore.Level {
