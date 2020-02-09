@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"github.com/Ggkd/conf"
+	"github.com/Ggkd/secProxy/conf"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
@@ -92,11 +92,11 @@ func syncBlackIpList()  {
 
 // 初始化redis处理队列
 func InitRedisProcess()  {
-	for i:=0; i<conf.Config.RedisProxy2Layer.WriteGoroutineNum; i++ {
+	for i:=0; i< conf.Config.RedisProxy2Layer.WriteGoroutineNum; i++ {
 		go WriteHandle()
 	}
 
-	for i:=0; i<conf.Config.RedisProxy2Layer.ReadGoroutineNum; i++ {
+	for i:=0; i< conf.Config.RedisProxy2Layer.ReadGoroutineNum; i++ {
 		go ReadHandle()
 	}
 }

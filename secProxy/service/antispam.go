@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/Ggkd/conf"
+	"github.com/Ggkd/secProxy/conf"
 	"sync"
 )
 

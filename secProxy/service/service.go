@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
-	"github.com/Ggkd/conf"
+	"github.com/Ggkd/secProxy/conf"
 	"time"
 )
 

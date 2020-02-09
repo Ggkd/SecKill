@@ -1,0 +1,5 @@
+{"level":"info","ts":1581226547.2461782,"msg":"----------RedisProxy2LayerPool success----------"}
+{"level":"info","ts":1581226547.247045,"msg":"----------RedisLayer2ProxyPool成功----------"}
+{"level":"info","ts":1581226547.247508,"msg":"----------初始化ProxyEtcdClient成功----------"}
+{"level":"debug","ts":1581226547.249312,"msg":"get secInfo Key[secKill/product], Value[[{\"ProductId\":11,\"StartTime\":1580711411,\"EndTime\":1580712811,\"Count\":100,\"Status\":1},{\"ProductId\":22,\"StartTime\":1580711422,\"EndTime\":1580712822,\"Count\":50,\"Status\":1}]]"}
+{"level":"info","ts":1581226547.2493792,"msg":"------------------------->map[11:0xc0002a6000 22:0xc0002a6028]"}

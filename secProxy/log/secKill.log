@@ -1,0 +1,15 @@
+{"level":"info","ts":1581225486.5036428,"msg":"----------初始化redis成功----------"}
+{"level":"info","ts":1581225486.504501,"msg":"----------初始化redis成功----------"}
+{"level":"info","ts":1581225486.505119,"msg":"----------初始化etcd成功----------"}
+{"level":"debug","ts":1581225486.509896,"msg":"get secInfo Key[secKill/product], Value[[{\"ProductId\":11,\"StartTime\":1580711411,\"EndTime\":1580712811,\"Count\":100,\"Status\":1},{\"ProductId\":22,\"StartTime\":1580711422,\"EndTime\":1580712822,\"Count\":50,\"Status\":1}]]"}
+{"level":"info","ts":1581225486.509974,"msg":"------------------------->map[11:0xc00030a000 22:0xc00030a028]"}
+{"level":"debug","ts":1581225486.5100448,"msg":"---------etcd watching-----------"}
+{"level":"error","ts":1581225487.5858319,"msg":"BLPOP user ipblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225487.5858939,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225487.585831,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225488.608984,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225488.7133849,"msg":"BLPOP user ipblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225488.713411,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225489.742205,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225489.844759,"msg":"BLPOP user ipblacklist err-------->redigo: nil returned"}
+{"level":"error","ts":1581225489.8448,"msg":"BLPOP user idblacklist err-------->redigo: nil returned"}

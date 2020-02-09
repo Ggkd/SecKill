@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/Ggkd/conf"
+	"github.com/Ggkd/secProxy/conf"
 	"github.com/Ggkd/secProxy/service"
 	"github.com/gin-gonic/gin"
 	"net/http"

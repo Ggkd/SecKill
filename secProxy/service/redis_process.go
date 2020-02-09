@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Ggkd/conf"
+	"github.com/Ggkd/secProxy/conf"
 )
 
 // 写处理
