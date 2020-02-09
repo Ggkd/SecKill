@@ -10,23 +10,49 @@ import (
 	"time"
 )
 
-// RedisPool Redis连接池
-var RedisPool *redis.Pool
+// RedisBlackPool Redis连接池
+var RedisBlackPool *redis.Pool
+var RedisProxy2LayerPool *redis.Pool
 
 // 初始化redis
-func InitRedis()  {
-	RedisPool = &redis.Pool{
-		MaxIdle:     Config.Redis.MaxIdle,
-		MaxActive:   Config.Redis.MaxActive,
-		IdleTimeout: time.Duration(Config.Redis.IdleTimeout) * time.Second,
+func InitRedisBlackList()  {
+	RedisBlackPool = &redis.Pool{
+		MaxIdle:     Config.RedisBlackList.MaxIdle,
+		MaxActive:   Config.RedisBlackList.MaxActive,
+		IdleTimeout: time.Duration(Config.RedisBlackList.IdleTimeout) * time.Second,
 		Wait:        true,
 		Dial: func() (redis.Conn, error) {
-			conn, err := redis.Dial("tcp", fmt.Sprintf(Config.Redis.Ip + ":" + Config.Redis.Port))
+			conn, err := redis.Dial("tcp", fmt.Sprintf(Config.RedisBlackList.Ip + ":" + Config.RedisBlackList.Port))
 			return conn, err
 		},
 	}
 	// 检测redis是否连接成功
-	conn := RedisPool.Get()
+	conn := RedisBlackPool.Get()
+	defer conn.Close()
+	_, err := conn.Do("ping")
+	if err != nil {
+		fmt.Println("初始化redis err--------->", err)
+		SugarLogger.Error("初始化redis err--------->", err)
+		return
+	}
+	fmt.Println("----------初始化redis成功----------")
+	SugarLogger.Info("----------初始化redis成功----------")
+}
+
+// 初始化redis
+func InitRedisProxy2Layer()  {
+	RedisProxy2LayerPool = &redis.Pool{
+		MaxIdle:     Config.RedisProxy2Layer.MaxIdle,
+		MaxActive:   Config.RedisProxy2Layer.MaxActive,
+		IdleTimeout: time.Duration(Config.RedisProxy2Layer.IdleTimeout) * time.Second,
+		Wait:        true,
+		Dial: func() (redis.Conn, error) {
+			conn, err := redis.Dial("tcp", fmt.Sprintf(Config.RedisProxy2Layer.Ip + ":" + Config.RedisProxy2Layer.Port))
+			return conn, err
+		},
+	}
+	// 检测redis是否连接成功
+	conn := RedisProxy2LayerPool.Get()
 	defer conn.Close()
 	_, err := conn.Do("ping")
 	if err != nil {
@@ -117,9 +143,9 @@ func UpdateSecProduct(productInfo []SecKillInfo)  {
 	for i, _ := range productInfo {
 		tmp[productInfo[i].ProductId] = &productInfo[i]
 	}
-	Config.RwLock.Lock()
+	Config.ProductRwLock.Lock()
 	Config.SecKillProductMap = tmp
-	Config.RwLock.Unlock()
+	Config.ProductRwLock.Unlock()
 	fmt.Println("------------------------->", Config.SecKillProductMap)
 	SugarLogger.Info("------------------------->", Config.SecKillProductMap)
 }
@@ -130,7 +156,8 @@ func init()  {
 	Config.SecKillProductMap = make(map[int]*SecKillInfo, 1000)
 	fmt.Println("===========初始化Log、Redis、Etcd===========")
 	InitLog()
-	InitRedis()
+	InitRedisBlackList()
+	InitRedisProxy2Layer()
 	InitEtcd()
 	InitSecInfo()
 	go WatchEtcd()

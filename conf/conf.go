@@ -10,14 +10,16 @@ import (
 // 总配置
 type Conf struct {
 	Host              `ini:"host"`
-	Redis             `ini:"redis"`
+	RedisBlackList    `ini:"redis_black_list"`
 	Etcd              `ini:"etcd"`
 	Log               `ini:"log"`
 	SecKillProductMap map[int]*SecKillInfo
-	RwLock            sync.RWMutex
+	ProductRwLock     sync.RWMutex
 	UserControl       `ini:"user_control"`
 	UserIdBlackList   map[string]bool
 	UserIpBlackList   map[string]bool
+	BlackRwLock       sync.RWMutex
+	RedisProxy2Layer  `ini:"redis_proxy2layer"`
 }
 
 // 主机配置
@@ -26,13 +28,26 @@ type Host struct {
 	Port string `ini:"port"`
 }
 
-// redis配置
-type Redis struct {
+// redis黑名单配置
+type RedisBlackList struct {
 	Ip          string `ini:"ip"`
 	Port        string `ini:"port"`
 	MaxIdle     int    `ini:"MaxIdle"`
 	MaxActive   int    `ini:"MaxActive"`
 	IdleTimeout int    `ini:"IdleTimeout"`
+}
+
+// redis接口层——>逻辑层
+type RedisProxy2Layer struct {
+	Ip                string `ini:"ip"`
+	Port              string `ini:"port"`
+	MaxIdle           int    `ini:"MaxIdle"`
+	MaxActive         int    `ini:"MaxActive"`
+	IdleTimeout       int    `ini:"IdleTimeout"`
+	WriteGoroutineNum int    `ini:"writeGoroutineNum"`
+	ReadGoroutineNum  int    `ini:"readGoroutineNum"`
+	ReqChan           chan *ReqSecKill
+	ReqChanSize       int `ini:"reqChanSize"`
 }
 
 // etcd配置

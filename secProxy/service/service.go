@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Ggkd/conf"
-	"github.com/garyburd/redigo/redis"
 	"time"
 )
 
@@ -28,21 +27,21 @@ func SecInfoById(productId int) interface{} {
 //获取所有的商品
 func SecInfoList() interface{} {
 	var productList []currentProductInfo
-	conf.Config.RwLock.RLock()
+	conf.Config.ProductRwLock.RLock()
 	for id, _ := range conf.Config.SecKillProductMap {
 		currentProduct := checkProduct(id)
 		productList = append(productList, currentProduct)
 	}
-	conf.Config.RwLock.RUnlock()
+	conf.Config.ProductRwLock.RUnlock()
 	return productList
 }
 
 //获取商品的状态
 func checkProduct(productId int) currentProductInfo {
 	currentProduct := currentProductInfo{}
-	conf.Config.RwLock.RLock()
+	conf.Config.ProductRwLock.RLock()
 	v, ok := conf.Config.SecKillProductMap[productId]
-	conf.Config.RwLock.RUnlock()
+	conf.Config.ProductRwLock.RUnlock()
 	if !ok {
 		currentProduct.ProductId = productId
 		currentProduct.Status = "product isn't exist"
@@ -113,31 +112,6 @@ func checkUser(req *conf.ReqSecKill) error {
 		err = errors.New("invalid request")
 		return err
 	}
+	conf.Config.RedisProxy2Layer.ReqChan <- req
 	return err
-}
-
-func GetRedisBlackList()  {
-	conn := conf.RedisPool.Get()
-	// 获取黑名单的id list
-	reply, err := conn.Do("hgetall", "idblacklist")
-	idlist, err := redis.Strings(reply, err)
-	if err != nil {
-		conf.SugarLogger.Error("hgetall user idblacklist err-------->", err)
-		fmt.Println("hget user idblacklist err-------->", err)
-		return
-	}
-	for _, id := range idlist {
-		conf.Config.UserIdBlackList[id] = true
-	}
-	// 获取黑名单的ip list
-	reply, err = conn.Do("hgetall", "ipblacklist")
-	iplist, err := redis.Strings(reply, err)
-	if err != nil {
-		conf.SugarLogger.Error("hgetall user ipblacklist err-------->", err)
-		fmt.Println("hget user ipblacklist err-------->", err)
-		return
-	}
-	for _, id := range iplist {
-		conf.Config.UserIpBlackList[id] = true
-	}
 }
