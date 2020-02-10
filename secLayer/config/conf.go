@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/Ggkd/secLayer/service"
 	"gopkg.in/ini.v1"
 	"sync"
 	"time"
@@ -9,18 +10,20 @@ import (
 
 // 总配置
 type Conf struct {
-	Host              `ini:"host"`
-	Etcd              `ini:"etcd"`
-	Log               `ini:"log"`
-	ProductRwLock     sync.RWMutex
-	UserIdBlackList   map[string]bool
-	UserIpBlackList   map[string]bool
-	BlackRwLock       sync.RWMutex
-	RedisProxy2Layer  `ini:"redis_proxy2layer"`
-	SecKillProductMap map[int]*SecKillInfo
-	Service           `ini:"service"`
-	UserHandleChan chan *ReqSecKill
-
+	Host               `ini:"host"`
+	Etcd               `ini:"etcd"`
+	Log                `ini:"log"`
+	ProductRwLock      sync.RWMutex
+	UserIdBlackList    map[string]bool
+	UserIpBlackList    map[string]bool
+	BlackRwLock        sync.RWMutex
+	RedisProxy2Layer   `ini:"redis_proxy2layer"`
+	SecKillProductMap  map[int]*SecKillInfo
+	Service            `ini:"service"`
+	ReadHandleChan     chan *ReqSecKill
+	WriteHandleChan    chan *RespSecKill
+	UserBuyHistory     map[string]*service.UserHistory
+	UserBuyHistoryLock sync.RWMutex
 }
 
 // 主机配置
@@ -55,20 +58,26 @@ type Log struct {
 
 // 服务处理配置
 type Service struct {
-	WriteGoroutineNum  int `ini:"writeGoroutineNum"`
-	ReadGoroutineNum   int `ini:"readGoroutineNum"`
-	HandleGoroutineNum int `ini:"handleGoroutineNum"`
-	ReadHandleChanSize int `ini:"readHandleChanSize"`
-	MaxTimeOut         int `ini:"MaxTimeOut"`
+	WriteGoroutineNum   int `ini:"writeGoroutineNum"`
+	ReadGoroutineNum    int `ini:"readGoroutineNum"`
+	HandleGoroutineNum  int `ini:"handleGoroutineNum"`
+	ReadHandleChanSize  int `ini:"readHandleChanSize"`
+	WriteHandleChanSize int `ini:"writeHandleChanSize"`
+	MaxTimeOut          int `ini:"MaxTimeOut"`
+	ChanWaitTime        int `ini:"ChanWaitTime"`
 }
 
 // 秒杀商品配置
 type SecKillInfo struct {
-	ProductId int
-	StartTime int64
-	EndTime   int64
-	Count     int
-	Status    int
+	ProductId    int
+	StartTime    int64
+	EndTime      int64
+	Count        int
+	Status       int
+	MaxSecNum    int // 每秒最多售出的数量
+	SecLimit     *service.SecLimit
+	UserBuyLimit int     // 用户最多购买的数量
+	BuyRate      float64 //用户买到的概率
 }
 
 // 用户请求配置
@@ -85,6 +94,15 @@ type ReqSecKill struct {
 	UserRefer  string
 }
 
+// 返回响应配置
+type RespSecKill struct {
+	ProductId int
+	UserId    string
+	Token     string
+	Code      int
+	Msg       string
+}
+
 // 全局配置对象
 var LayerConfig = new(Conf)
 
@@ -96,6 +114,8 @@ func init() {
 		fmt.Println("加载Layer配置err--------->", err)
 		return
 	}
-	LayerConfig.UserHandleChan = make(chan *ReqSecKill, LayerConfig.Service.ReadHandleChanSize)
+	LayerConfig.ReadHandleChan = make(chan *ReqSecKill, LayerConfig.Service.ReadHandleChanSize)
+	LayerConfig.WriteHandleChan = make(chan *RespSecKill, LayerConfig.Service.WriteHandleChanSize)
+	LayerConfig.UserBuyHistory = make(map[int]*SecKillInfo, 10000)
 	fmt.Println("----------加载Layer配置成功----------")
 }

@@ -125,6 +125,7 @@ func UpdateSecProduct(productInfo []config.SecKillInfo)  {
 	tmp := make(map[int]*config.SecKillInfo, 1000)
 	for i, _ := range productInfo {
 		tmp[productInfo[i].ProductId] = &productInfo[i]
+		tmp[productInfo[i].ProductId].SecLimit = &SecLimit{}
 	}
 	config.LayerConfig.ProductRwLock.Lock()
 	config.LayerConfig.SecKillProductMap = tmp
@@ -154,77 +155,6 @@ func InitSecInfo()  {
 		config.SugarLogger.Debugf("get secInfo Key[%v], Value[%v]", string(kv.Key), string(kv.Value))
 	}
 	UpdateSecProduct(ProductInfos)
-}
-
-
-// 进程调度
-func RunProcess()  {
-	for i:=0; i< config.LayerConfig.Service.ReadGoroutineNum; i++ {
-		WG.Add(1)
-		go HandleRead()
-	}
-
-	for i:=0; i< config.LayerConfig.Service.WriteGoroutineNum; i++ {
-		WG.Add(1)
-		go HandleWrite()
-	}
-
-	for i:=0; i< config.LayerConfig.Service.HandleGoroutineNum; i++ {
-		WG.Add(1)
-		go HandleUser()
-	}
-
-	fmt.Println("all process goroutine start")
-	config.SugarLogger.Info("all process goroutine start")
-	WG.Wait()
-	fmt.Println("all process goroutine end")
-	config.SugarLogger.Info("all process goroutine end")
-}
-
-
-// 读处理
-func HandleRead()  {
-	for {
-		// 从redis pool 获取一个连接
-		conn := RedisProxy2LayerPool.Get()
-		for {
-			reply, err := conn.Do("blpop", "queuelist", 0)
-			data, err := redis.String(reply, err)
-			if err != nil {
-				fmt.Println("blpop err--------->", err)
-				config.SugarLogger.Error("blpop err--------->", err)
-				break
-			}
-
-			config.SugarLogger.Debugf("blpop value [%v]\n", data)
-
-			var req config.ReqSecKill
-			err = json.Unmarshal([]byte(data), &req)
-			if err != nil {
-				fmt.Println("unmarshal req data err-------->", err)
-				config.SugarLogger.Error("unmarshal req data err-------->",  err)
-				continue
-			}
-			// 判断用户的请求是否超时
-			nowTime := time.Now().Unix()
-			if nowTime - req.AccessTime.Unix() > int64(config.LayerConfig.Service.MaxTimeOut) {
-				config.SugarLogger.Warn("[%v] req timeout", req)
-				continue
-			}
-			// 将请求发送到通道
-			config.LayerConfig.UserHandleChan <- &req
-		}
-	}
-}
-
-// 写处理
-func HandleWrite()  {
-
-}
-
-//用户处理
-func HandleUser()  {
-
 }
 
 
